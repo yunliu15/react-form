@@ -30,18 +30,26 @@ const Register = () => {
         userRef.current.focus();
     }, [])
 
-    useEffect(() => {
-        setValidName(USER_REGEX.test(user));
-    }, [user])
-
-    useEffect(() => {
-        setValidPwd(PWD_REGEX.test(pwd));
-        setValidMatch(pwd === matchPwd);
-    }, [pwd, matchPwd])
-
-    useEffect(() => {
+    const handleUserChange = (e) => {
+        setUser(e.target.value);
+        setValidName(USER_REGEX.test(e.target.value));
         setErrMsg('');
-    }, [user, pwd, matchPwd])
+    }
+    
+    const handlePwdChange = (e) => {
+        let newPwd = e.target.value;
+        setPwd(newPwd);
+        setValidPwd(PWD_REGEX.test(newPwd));
+        setValidMatch(newPwd === matchPwd);
+        setErrMsg('');
+    }
+
+    const handleConfirmPwdChange = (e) => {
+        let newPwd = e.target.value;
+        setMatchPwd(newPwd)
+        setValidMatch(pwd === newPwd);
+        setErrMsg('');
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -105,7 +113,7 @@ const Register = () => {
                             id="username"
                             ref={userRef}
                             autoComplete="off"
-                            onChange={(e) => setUser(e.target.value)}
+                            onChange={handleUserChange}
                             value={user}
                             required
                             aria-invalid={validName ? "false" : "true"}
@@ -129,7 +137,7 @@ const Register = () => {
                         <input
                             type="password"
                             id="password"
-                            onChange={(e) => setPwd(e.target.value)}
+                            onChange={handlePwdChange}
                             value={pwd}
                             required
                             aria-invalid={validPwd ? "false" : "true"}
@@ -153,7 +161,7 @@ const Register = () => {
                         <input
                             type="password"
                             id="confirm_pwd"
-                            onChange={(e) => setMatchPwd(e.target.value)}
+                            onChange={handleConfirmPwdChange}
                             value={matchPwd}
                             required
                             aria-invalid={validMatch ? "false" : "true"}
