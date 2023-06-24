@@ -5,7 +5,8 @@ function App() {
 
   return (
     <main className="App">
-      <Login />
+      {/* <Login /> */}
+      <Register />
     </main>
   );
 }

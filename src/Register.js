@@ -11,17 +11,23 @@ const Register = () => {
     const userRef = useRef();
     const errRef = useRef();
 
-    const [user, setUser] = useState('');
-    const [validName, setValidName] = useState(false);
-    const [userFocus, setUserFocus] = useState(false);
+    const [user, setUser] = useState({
+        value: '',
+        validName: false,
+        userFocus: false
+    });
 
-    const [pwd, setPwd] = useState('');
-    const [validPwd, setValidPwd] = useState(false);
-    const [pwdFocus, setPwdFocus] = useState(false);
+    const [pwd, setPwd] = useState({
+        value: '',
+        validPwd: false,
+        pwdFocus: false
+    });
 
-    const [matchPwd, setMatchPwd] = useState('');
-    const [validMatch, setValidMatch] = useState(false);
-    const [matchFocus, setMatchFocus] = useState(false);
+    const [matchPwd, setMatchPwd] = useState({
+        value: '',
+        validMatch: false,
+        matchFocus: false
+    });
 
     const [errMsg, setErrMsg] = useState('');
     const [success, setSuccess] = useState(false);
@@ -31,38 +37,39 @@ const Register = () => {
     }, [])
 
     const handleUserChange = (e) => {
-        setUser(e.target.value);
-        setValidName(USER_REGEX.test(e.target.value));
+        setUser({
+            ...user,
+            value: e.target.value,
+            validName: USER_REGEX.test(e.target.value)
+        })
         setErrMsg('');
     }
     
     const handlePwdChange = (e) => {
         let newPwd = e.target.value;
-        setPwd(newPwd);
-        setValidPwd(PWD_REGEX.test(newPwd));
-        setValidMatch(newPwd === matchPwd);
+        setPwd({...pwd, value: newPwd, validPwd: PWD_REGEX.test(newPwd)})
+        setMatchPwd({...matchPwd, validMatch: newPwd === matchPwd});
         setErrMsg('');
     }
 
     const handleConfirmPwdChange = (e) => {
         let newPwd = e.target.value;
-        setMatchPwd(newPwd)
-        setValidMatch(pwd === newPwd);
+        setMatchPwd({...matchPwd, value: newPwd, validMatch: pwd.value === newPwd})
         setErrMsg('');
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         // if button enabled with JS hack
-        const v1 = USER_REGEX.test(user);
-        const v2 = PWD_REGEX.test(pwd);
+        const v1 = USER_REGEX.test(user.value);
+        const v2 = PWD_REGEX.test(pwd.value);
         if (!v1 || !v2) {
             setErrMsg("Invalid Entry");
             return;
         }
         try {
             const response = await axios.post(REGISTER_URL,
-                JSON.stringify({ user, pwd }),
+                JSON.stringify({ user:user.value, pwd:pwd.value }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
@@ -74,9 +81,9 @@ const Register = () => {
             setSuccess(true);
             //clear state and controlled inputs
             //need value attrib on inputs for this
-            setUser('');
-            setPwd('');
-            setMatchPwd('');
+            setUser({value: '',validName: false,userFocus: false});
+            setPwd({value: '',validPwd: false,pwdFocus: false});
+            setMatchPwd({value: '',validMatch: false,matchFocus: false});
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');
@@ -105,8 +112,8 @@ const Register = () => {
                     <form onSubmit={handleSubmit}>
                         <label htmlFor="username">
                             Username:
-                            <FontAwesomeIcon icon={faCheck} className={validName ? "valid" : "hide"} />
-                            <FontAwesomeIcon icon={faTimes} className={validName || !user ? "hide" : "invalid"} />
+                            <FontAwesomeIcon icon={faCheck} className={user.validName ? "valid" : "hide"} />
+                            <FontAwesomeIcon icon={faTimes} className={user.validName || !user.value ? "hide" : "invalid"} />
                         </label>
                         <input
                             type="text"
@@ -114,14 +121,14 @@ const Register = () => {
                             ref={userRef}
                             autoComplete="off"
                             onChange={handleUserChange}
-                            value={user}
+                            value={user.value}
                             required
-                            aria-invalid={validName ? "false" : "true"}
+                            aria-invalid={user.validName ? "false" : "true"}
                             aria-describedby="uidnote"
-                            onFocus={() => setUserFocus(true)}
-                            onBlur={() => setUserFocus(false)}
+                            onFocus={() => setUser({...user, userFocus:true})}
+                            onBlur={() => setUser({...user, userFocus:false})}
                         />
-                        <p id="uidnote" className={userFocus && user && !validName ? "instructions" : "offscreen"}>
+                        <p id="uidnote" className={user.userFocus && user.value && !user.validName ? "instructions" : "offscreen"}>
                             <FontAwesomeIcon icon={faInfoCircle} />
                             4 to 24 characters.<br />
                             Must begin with a letter.<br />
@@ -131,21 +138,21 @@ const Register = () => {
 
                         <label htmlFor="password">
                             Password:
-                            <FontAwesomeIcon icon={faCheck} className={validPwd ? "valid" : "hide"} />
-                            <FontAwesomeIcon icon={faTimes} className={validPwd || !pwd ? "hide" : "invalid"} />
+                            <FontAwesomeIcon icon={faCheck} className={pwd.validPwd ? "valid" : "hide"} />
+                            <FontAwesomeIcon icon={faTimes} className={pwd.validPwd || !pwd.value ? "hide" : "invalid"} />
                         </label>
                         <input
                             type="password"
                             id="password"
                             onChange={handlePwdChange}
-                            value={pwd}
+                            value={pwd.value}
                             required
-                            aria-invalid={validPwd ? "false" : "true"}
+                            aria-invalid={pwd.validPwd ? "false" : "true"}
                             aria-describedby="pwdnote"
-                            onFocus={() => setPwdFocus(true)}
-                            onBlur={() => setPwdFocus(false)}
+                            onFocus={() => setPwd({...pwd, pwdFocus: true})}
+                            onBlur={() => setPwd({...pwd, pwdFocus: false})}
                         />
-                        <p id="pwdnote" className={pwdFocus && !validPwd ? "instructions" : "offscreen"}>
+                        <p id="pwdnote" className={pwd.pwdFocus && !pwd.validPwd ? "instructions" : "offscreen"}>
                             <FontAwesomeIcon icon={faInfoCircle} />
                             8 to 24 characters.<br />
                             Must include uppercase and lowercase letters, a number and a special character.<br />
@@ -155,26 +162,26 @@ const Register = () => {
 
                         <label htmlFor="confirm_pwd">
                             Confirm Password:
-                            <FontAwesomeIcon icon={faCheck} className={validMatch && matchPwd ? "valid" : "hide"} />
-                            <FontAwesomeIcon icon={faTimes} className={validMatch || !matchPwd ? "hide" : "invalid"} />
+                            <FontAwesomeIcon icon={faCheck} className={matchPwd.validMatch && matchPwd.value ? "valid" : "hide"} />
+                            <FontAwesomeIcon icon={faTimes} className={matchPwd.validMatch || !matchPwd.value ? "hide" : "invalid"} />
                         </label>
                         <input
                             type="password"
                             id="confirm_pwd"
                             onChange={handleConfirmPwdChange}
-                            value={matchPwd}
+                            value={matchPwd.value}
                             required
-                            aria-invalid={validMatch ? "false" : "true"}
+                            aria-invalid={matchPwd.validMatch ? "false" : "true"}
                             aria-describedby="confirmnote"
-                            onFocus={() => setMatchFocus(true)}
-                            onBlur={() => setMatchFocus(false)}
+                            onFocus={() => setMatchPwd({...matchPwd, matchFocus:true})}
+                            onBlur={() => setMatchPwd({...matchPwd, matchFocus:false})}
                         />
-                        <p id="confirmnote" className={matchFocus && !validMatch ? "instructions" : "offscreen"}>
+                        <p id="confirmnote" className={matchPwd.matchFocus && !matchPwd.validMatch ? "instructions" : "offscreen"}>
                             <FontAwesomeIcon icon={faInfoCircle} />
                             Must match the first password input field.
                         </p>
 
-                        <button disabled={!validName || !validPwd || !validMatch ? true : false}>Sign Up</button>
+                        <button disabled={!user.validName || !pwd.validPwd || !matchPwd.validMatch ? true : false}>Sign Up</button>
                     </form>
                     <p>
                         Already registered?<br />
