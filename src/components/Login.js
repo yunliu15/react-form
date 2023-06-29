@@ -34,7 +34,8 @@ const Login = () => {
 
         try {
             const respons = await axios.post(LOGIN_URL, JSON.stringify({user, pwd}), {
-                headers: {'Content-Type':'application/json', withCredentials: true}
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
             });
             console.log(JSON.stringify(respons?.data))
             const accessToken = respons?.data?.accessToken;
