@@ -11,7 +11,7 @@ const useRefreshToken = () => {
         setAuth(prev => {
             console.log(JSON.stringify(prev));
             console.log(newToken);
-            return newToken;
+            return {...prev, accessToken: newToken};
         });
         return newToken;
 
