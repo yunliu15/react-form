@@ -1,16 +1,15 @@
 import { useState,useEffect } from "react";
-import axios from "../api/axios";
-import useRefreshToken from "../hooks/useRefreshToken";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const Users = () => {
     const [users, setUsers] = useState();
-    const refresh = useRefreshToken();
+    const axiosPrivate = useAxiosPrivate();
     useEffect(()=>{
         let isMounted = true;
         const controller = new AbortController();
         const getUsers = async () => {
             try {
-                const response = await axios.get('/users', {
+                const response = await axiosPrivate.get('/users', {
                     signal: controller.signal
                 })
                 console.log(response.data);
@@ -37,7 +36,6 @@ const Users = () => {
                     </ul>
                 ) : <p>No users to display</p>
             }
-            <button onClick={() => refresh()}>Refresh</button>
         </article>
      );
 }
