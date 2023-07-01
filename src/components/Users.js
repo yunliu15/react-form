@@ -1,9 +1,12 @@
 import { useState,useEffect } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Users = () => {
     const [users, setUsers] = useState();
     const axiosPrivate = useAxiosPrivate();
+    const navigate = useNavigate();
+    const location = useLocation();
     useEffect(()=>{
         let isMounted = true;
         const controller = new AbortController();
@@ -15,7 +18,11 @@ const Users = () => {
                 console.log(response.data);
                 isMounted && setUsers(response.data);
             } catch(err) {
-                console.error(err)
+                console.error('users', err);
+                if (err.response?.status === 403) {// got canceled error every time the component mounts, this is from the restrict developer mode. added the condition to avoid reditrection by canceled error
+                    navigate('/login', {state: {from: location}, replace: true});
+                }
+                
             }
         }
         getUsers();
