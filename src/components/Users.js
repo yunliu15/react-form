@@ -15,7 +15,8 @@ const Users = () => {
                 const response = await axiosPrivate.get('/users', {
                     signal: controller.signal
                 })
-                isMounted && setUsers(response.data);
+                const userName = await response.data.map(user=> user.username);
+                isMounted && setUsers(userName);
             } catch(err) {
                 console.error('users', err);
                 if (err.response?.status === 403) {// got canceled error every time the component mounts, this is from the restrict developer mode. added the condition to avoid reditrection by canceled error
@@ -38,7 +39,7 @@ const Users = () => {
             {users?.length
                 ? (
                     <ul>
-                        {users.map((user, i)=> <li key={i}>{user?.username}</li>)}
+                        {users.map((user)=> <li key={user}>{user}</li>)}
                     </ul>
                 ) : <p>No users to display</p>
             }
