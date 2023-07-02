@@ -9,8 +9,6 @@ const useRefreshToken = () => {
         });
         const newToken = await response.data.accessToken;
         setAuth(prev => {
-            console.log(JSON.stringify(prev));
-            console.log(newToken);
             return {
                 ...prev,
                 roles: response.data.roles, 

@@ -2,6 +2,7 @@ import {useRef, useState, useEffect} from 'react';
 import useAuth from '../hooks/useAuth';
 import axios from '../api/axios';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 const LOGIN_URL = '/login';
 
@@ -9,7 +10,7 @@ const Login = () => {
     const userRef = useRef();
     const errRef = useRef();
     const [errMsg, setErrMsg] = useState('');
-    const [user, setUser] = useState('');
+    const [user, setUser] = useLocalStorage('user', '')  //useState('');
     const [pwd, setPwd] = useState('');
     const {setAuth, persist, setPersist} = useAuth();
     const navigate = useNavigate();
@@ -37,7 +38,7 @@ const Login = () => {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
-            console.log(JSON.stringify(respons?.data))
+            
             const accessToken = respons?.data?.accessToken;
             const roles = respons?.data?.roles;
             setAuth({user, pwd, roles, accessToken});
@@ -61,10 +62,6 @@ const Login = () => {
     const togglePersist = () => {
         setPersist(prev => !prev);
     }
-
-    useEffect(() => {
-        localStorage.setItem('persist', persist)
-    }, [persist])
 
     return (
         <section>
@@ -111,7 +108,7 @@ const Login = () => {
                 Need an Account?<br />
                 <span className="line">
                     {/*put router link here*/}
-                    <a href="/register">Sign Up</a>
+                    <Link to="/register">Sign Up</Link>
                 </span>
             </p>
         </section>
